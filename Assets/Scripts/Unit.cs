@@ -41,6 +41,9 @@ public class Unit : MonoBehaviour
     //Unit Currently being targeted
     private Unit Target;
 
+    //UnitGroup this unit belongs too
+    public UnitGroup group;
+
     private void Awake()
     {
         unitID = globalID;
@@ -63,11 +66,6 @@ public class Unit : MonoBehaviour
         CreateUnitCard();
     }
 
-    private void OnDestroy()
-    {
-        Destroy(unitCard);
-    }
-
     private void Update()
     {
         unitCard.transform.position = Camera.main.WorldToScreenPoint((Vector3.up * 2f) + transform.position);
@@ -80,10 +78,13 @@ public class Unit : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Target = other.gameObject.transform.parent.gameObject.GetComponent<Unit>();
-        if(Target != null && Target.Team != Team)
+        Target = other.gameObject.GetComponent<Unit>();
+        if(Target != null)
         {
-            InvokeRepeating("AttackUnit", 0, AttackSpeed);
+            if (Target.Team != Team)
+            {
+                InvokeRepeating("AttackUnit", 0, AttackSpeed);
+            }
         }
     }
 
@@ -109,6 +110,12 @@ public class Unit : MonoBehaviour
     public int getID()
     {
         return unitID;
+    }
+
+    public void Kill()
+    {
+        unitCard.SetActive(false);
+        gameObject.SetActive(false);
     }
 
     public void MoveUnit(Vector3 targetPosition)
