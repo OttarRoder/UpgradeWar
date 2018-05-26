@@ -11,7 +11,6 @@ public class PlayerManager : MonoBehaviour
      * for instance selecting a unit, player team information ect.
      */
     public Camera playerCamera;
-    public GameObject prefab;
 
     public int Team { set; get; }
 
@@ -30,12 +29,13 @@ public class PlayerManager : MonoBehaviour
             Vector3 targetPosition = GetPoint();
             if(targetPosition != new Vector3(-1, -1, -1))
             {
-                //SelectedUnit.MoveGroup(targetPosition);
+                Debug.Log("Moving UnitGroup to positon " + targetPosition.ToString());
+                SelectedUnit.MoveGroup(targetPosition);
             }
         }
         if(Input.GetKeyDown("e"))
         {
-            UnitManager.instance.SpawnUnitGroup(GetPoint(), Quaternion.identity, prefab, 10);
+            UnitManager.instance.GetUnitGroup(GetPoint(), Quaternion.identity, 10, 10, 1.5f);
         }
     }
 
@@ -57,6 +57,7 @@ public class PlayerManager : MonoBehaviour
         if (Physics.Raycast(playerCamera.ScreenPointToRay(Input.mousePosition), out hit, hitRange, LayerMask.GetMask("Units")))
         {
             SelectedUnit = hit.collider.GetComponent<Unit>().group;
+            Debug.Log("Selected Unit " + (hit.collider.GetComponent<Unit>().getID()).ToString());
         }
     }
 

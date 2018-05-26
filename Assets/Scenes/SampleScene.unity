@@ -251,7 +251,7 @@ MonoBehaviour:
   - {fileID: 1713649288024974, guid: daa25f588e35abf4b90ceb5b25c9c0e0, type: 2}
   - {fileID: 1925903242047812, guid: 790e2fe09ba300c4f962abc3061845e4, type: 2}
   - {fileID: 1650606727647814, guid: 3f070208332925a4796c35cd6da7c92d, type: 2}
-  pooledAmounts: c8000000c80000000a000000
+  pooledAmounts: 320000003200000005000000
 --- !u!4 &500272057
 Transform:
   m_ObjectHideFlags: 0

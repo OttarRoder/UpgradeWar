@@ -21,6 +21,7 @@ public class Unit : MonoBehaviour
     private float AttackMax;
     private float AttackMin;
     private float AttackSpeed;
+    private float AttackRange;
 
     //Agent statisitscs
     private float MovementSpeed;
@@ -32,17 +33,15 @@ public class Unit : MonoBehaviour
     private float Mass;
 
     //Unit Display
-    public GameObject unitCardPrefab;
     private GameObject unitCard;
 
-    //Team of Unit
+    //Groups that the Unit belongs to
     public int Team;
-
-    //Unit Currently being targeted
-    private Unit Target;
-
-    //UnitGroup this unit belongs too
     public UnitGroup group;
+
+    //Combat Variables
+    private List<Unit> Targets;
+    private bool Combat;
 
     private void Awake()
     {
@@ -55,56 +54,87 @@ public class Unit : MonoBehaviour
 
     private void Start()
     {
+        Targets = new List<Unit>();
         attackCollider = transform.GetChild(1).GetComponent<Collider>();
 
-        Team = 0;
         AttackMax = 8;
         AttackMin = 6;
-        AttackSpeed = 1;
-        HealthMax = 50;
+        AttackSpeed = 2.5f;
+        AttackRange = 3;
+        HealthMax = 250;
         HealthCurrent = HealthMax;
-        CreateUnitCard();
     }
 
     private void Update()
     {
         unitCard.transform.position = Camera.main.WorldToScreenPoint((Vector3.up * 2f) + transform.position);
         unitCard.transform.GetChild(0).gameObject.GetComponent<Image>().fillAmount = (HealthCurrent / HealthMax);
-        if(HealthCurrent <=0 )
+
+        // If this unit has 0 health or less, kill it
+        if (HealthCurrent <= 0)
         {
-            Destroy(this.gameObject);
+            UnitManager.instance.KillUnit(this);
         }
+        // Remove out of range or dead targets
+        RemoveTargets();
+
+        if(Targets.Count > 0 && Combat == false)
+        {
+            Combat = true;
+            InvokeRepeating("Attack", 0, AttackSpeed);
+        }
+        else if(Combat)
+        {
+            Combat = false;
+            CancelInvoke();
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (unitCard != null)
+        {
+            unitCard.SetActive(false);
+        }
+    }
+
+    private void OnEnable()
+    {
+        GameObject go = ObjectPooler.instance.GetPooledObject(0);
+        go.transform.SetParent(UIController.instance.getCanvas().transform , false);
+        unitCard = go;
+        unitCard.SetActive(true);
+
+        Combat = false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Target = other.gameObject.GetComponent<Unit>();
-        if(Target != null)
+        if(other.tag == "Unit")
         {
-            if (Target.Team != Team)
+            Unit u = other.gameObject.GetComponent<Unit>();
+            if(u.Team != Team)
             {
-                InvokeRepeating("AttackUnit", 0, AttackSpeed);
+                Targets.Add(u);
             }
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    private void RemoveTargets()
     {
-        this.CancelInvoke();
-        Target = null;
-    }
-
-    private void AttackUnit()
-    {
-        Target.HealthCurrent -= Random.Range(AttackMin, AttackMax);
-    }
-
-    private void CreateUnitCard()
-    {
-        GameObject go = Instantiate(unitCardPrefab, Vector3.zero, Quaternion.identity) as GameObject;
-        go.transform.SetParent(UIController.instance.getCanvas().transform , false);
-        unitCard = go;
-
+        if(Targets.Count > 0)
+        {
+            if (!(Targets[0].isActiveAndEnabled))
+            {
+                Targets.RemoveAt(0);
+                RemoveTargets();
+            }
+            else if (Vector3.Distance(transform.position, Targets[0].transform.position) > AttackRange)
+            {
+                Targets.RemoveAt(0);
+                RemoveTargets();
+            }
+        }
     }
 
     public int getID()
@@ -112,10 +142,9 @@ public class Unit : MonoBehaviour
         return unitID;
     }
 
-    public void Kill()
+    public void Attack()
     {
-        unitCard.SetActive(false);
-        gameObject.SetActive(false);
+        Targets[0].HealthCurrent -= Random.Range(AttackMin, AttackMax);
     }
 
     public void MoveUnit(Vector3 targetPosition)
