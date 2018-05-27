@@ -42,7 +42,10 @@ public class Unit : MonoBehaviour
     //Combat Variables
     private List<Unit> Targets;
     private bool Combat;
+    private bool seekTarget;
 
+
+    //Private Methods
     private void Awake()
     {
         unitID = globalID;
@@ -61,7 +64,7 @@ public class Unit : MonoBehaviour
         AttackMin = 6;
         AttackSpeed = 2.5f;
         AttackRange = 3;
-        HealthMax = 250;
+        HealthMax = 500;
         HealthCurrent = HealthMax;
     }
 
@@ -78,6 +81,13 @@ public class Unit : MonoBehaviour
         // Remove out of range or dead targets
         RemoveTargets();
 
+        //If seeking targets, set attack move
+        if(seekTarget)
+        {
+            MoveUnit(ClosestTarget());
+        }
+
+        //If there is targets and not in combat, initiate combat, if not targets end combat
         if(Targets.Count > 0 && Combat == false)
         {
             Combat = true;
@@ -106,6 +116,7 @@ public class Unit : MonoBehaviour
         unitCard.SetActive(true);
 
         Combat = false;
+        seekTarget = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -137,9 +148,32 @@ public class Unit : MonoBehaviour
         }
     }
 
+    private Vector3 ClosestTarget()
+    {
+        float dist = 0;
+        float lowestDist = AttackRange;
+        int t = 0;
+        for (int i = 0; i < Targets.Count; i++)
+        {
+            dist = Vector3.Distance(transform.position, Targets[i].gameObject.transform.position);
+            if (dist < lowestDist)
+            {
+                lowestDist = dist;
+                t = i;
+            }
+        }
+        return Targets[t].transform.position;
+    }
+
+    //Public Methods
     public int getID()
     {
         return unitID;
+    }
+
+    public void SeekTargets(bool a)
+    {
+        seekTarget = a;
     }
 
     public void Attack()

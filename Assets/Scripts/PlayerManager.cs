@@ -16,10 +16,17 @@ public class PlayerManager : MonoBehaviour
 
     private float hitRange = 1000f;
     private UnitGroup SelectedUnit;
-
+    private bool attackMove = false;
 
     private void Update()
     {
+        if(Input.GetKeyDown("t"))
+        {
+            if (attackMove)
+                attackMove = false;
+            attackMove = true;
+        }
+
         if(Input.GetMouseButtonDown(0))
         {
             Selection();
@@ -30,12 +37,14 @@ public class PlayerManager : MonoBehaviour
             if(targetPosition != new Vector3(-1, -1, -1))
             {
                 Debug.Log("Moving UnitGroup to positon " + targetPosition.ToString());
+                if (attackMove)
+                    SelectedUnit.AttackGroup(targetPosition);
                 SelectedUnit.MoveGroup(targetPosition);
             }
         }
         if(Input.GetKeyDown("e"))
         {
-            UnitManager.instance.GetUnitGroup(GetPoint(), Quaternion.identity, 10, 10, 1.5f);
+            UnitManager.instance.GetUnitGroup(GetPoint(), Quaternion.identity, 50, 10, 1.5f);
         }
     }
 

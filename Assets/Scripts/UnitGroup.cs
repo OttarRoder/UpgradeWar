@@ -15,6 +15,8 @@ public class UnitGroup : MonoBehaviour
 
     public int Team { set; get; }
 
+    public bool activeEngage;
+
     private void Awake()
     {
         unitList = new List<Unit>();
@@ -71,19 +73,34 @@ public class UnitGroup : MonoBehaviour
 
     private void FixPosition()
     {
-        for (int i = 0; i < unitList.Count; i++)
+        if (!activeEngage)
         {
-            unitList[i].MoveUnit(UnitGroupPosition + unitOffset[i]);
+            for (int i = 0; i < unitList.Count; i++)
+            {
+                unitList[i].MoveUnit(UnitGroupPosition + unitOffset[i]);
+            }
         }
     }
 
+    public void AttackGroup(Vector3 pos)
+    {
+        activeEngage = true;
+        UnitGroupPosition = pos;
+        UpdatePositions();
+    }
 
     public void MoveGroup(Vector3 pos)
     {
+        activeEngage = false;
         UnitGroupPosition = pos;
+        UpdatePositions();
+    }
+
+    private void UpdatePositions()
+    {
         for (int i = 0; i < unitList.Count; i++)
         {
-            unitList[i].MoveUnit(pos + unitOffset[i]);
+            unitList[i].MoveUnit(UnitGroupPosition + unitOffset[i]);
         }
     }
 
