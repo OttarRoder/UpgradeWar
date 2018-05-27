@@ -14,8 +14,9 @@ public class UnitGroup : MonoBehaviour
     public Quaternion UnitGroupRotation { set; get; }
 
     public int Team { set; get; }
+    private bool activeEngage;
+    private UnitGroup targetGroup;
 
-    public bool activeEngage;
 
     private void Awake()
     {
@@ -23,10 +24,18 @@ public class UnitGroup : MonoBehaviour
         unitOffset = new List<Vector3>();
     }
 
+    private void Update()
+    {
+        if(unitList.Count == 0)
+        {
+            UnitManager.instance.KillUnitGroup(this);
+        }
+    }
+
     private void OnEnable()
     {
         SpawnGroup();
-        InvokeRepeating("FixPosition", 5, 2);
+        InvokeRepeating("FixPosition", 5, 0.5f);
     }
 
     private void OnDisable()
@@ -80,24 +89,56 @@ public class UnitGroup : MonoBehaviour
                 unitList[i].MoveUnit(UnitGroupPosition + unitOffset[i]);
             }
         }
+        else
+        {
+            if (!(targetGroup.isActiveAndEnabled))
+            {
+                targetGroup = null;
+                activeEngage = false;
+                return;
+            }
+            else
+            {
+                AttackGroup(targetGroup);
+            }
+        }
     }
 
-    public void AttackGroup(Vector3 pos)
+    private Vector3 ClosestUnit(Vector3 pos)
+    {
+        int index = 0;
+        float dist = Vector3.Distance(pos, unitList[0].gameObject.transform.position);
+        float temp = 0;
+        for (int i = 0; i < unitList.Count; i++)
+        {
+            temp = Vector3.Distance(pos, unitList[i].gameObject.transform.position);
+            if(temp < dist)
+            {
+                dist = temp;
+                index = i;
+            }
+        }
+        return unitList[index].gameObject.transform.position;
+    }
+
+
+    // Public Unit Group Functions
+    public void AttackGroup(UnitGroup target)
     {
         activeEngage = true;
-        UnitGroupPosition = pos;
-        UpdatePositions();
+        targetGroup = target;
+        UnitGroupPosition = target.UnitGroupPosition;
+        for(int i = 0; i < unitList.Count; i++)
+        {
+            unitList[i].MoveUnit(target.ClosestUnit(unitList[i].gameObject.transform.position));
+        }
     }
 
     public void MoveGroup(Vector3 pos)
     {
         activeEngage = false;
+        targetGroup = null;
         UnitGroupPosition = pos;
-        UpdatePositions();
-    }
-
-    private void UpdatePositions()
-    {
         for (int i = 0; i < unitList.Count; i++)
         {
             unitList[i].MoveUnit(UnitGroupPosition + unitOffset[i]);
@@ -107,5 +148,15 @@ public class UnitGroup : MonoBehaviour
     public void RemoveUnit(Unit u)
     {
         unitList.Remove(u);
+    }
+
+    //Temporary Testing Functions
+    public void ChangeTeam()
+    {
+        Team++;
+        for(int i = 0; i < unitList.Count; i++)
+        {
+            unitList[i].Team++;
+        }
     }
 }

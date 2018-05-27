@@ -42,7 +42,6 @@ public class Unit : MonoBehaviour
     //Combat Variables
     private List<Unit> Targets;
     private bool Combat;
-    private bool seekTarget;
 
 
     //Private Methods
@@ -62,9 +61,9 @@ public class Unit : MonoBehaviour
 
         AttackMax = 8;
         AttackMin = 6;
-        AttackSpeed = 2.5f;
+        AttackSpeed = 1.5f;
         AttackRange = 3;
-        HealthMax = 500;
+        HealthMax = 25;
         HealthCurrent = HealthMax;
     }
 
@@ -81,19 +80,13 @@ public class Unit : MonoBehaviour
         // Remove out of range or dead targets
         RemoveTargets();
 
-        //If seeking targets, set attack move
-        if(seekTarget)
-        {
-            MoveUnit(ClosestTarget());
-        }
-
         //If there is targets and not in combat, initiate combat, if not targets end combat
         if(Targets.Count > 0 && Combat == false)
         {
             Combat = true;
             InvokeRepeating("Attack", 0, AttackSpeed);
         }
-        else if(Combat)
+        if(Targets.Count == 0 && Combat == true)
         {
             Combat = false;
             CancelInvoke();
@@ -115,8 +108,8 @@ public class Unit : MonoBehaviour
         unitCard = go;
         unitCard.SetActive(true);
 
+        HealthCurrent = HealthMax;
         Combat = false;
-        seekTarget = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -169,11 +162,6 @@ public class Unit : MonoBehaviour
     public int getID()
     {
         return unitID;
-    }
-
-    public void SeekTargets(bool a)
-    {
-        seekTarget = a;
     }
 
     public void Attack()

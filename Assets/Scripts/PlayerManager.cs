@@ -20,31 +20,33 @@ public class PlayerManager : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown("t"))
-        {
-            if (attackMove)
-                attackMove = false;
-            attackMove = true;
-        }
-
         if(Input.GetMouseButtonDown(0))
         {
-            Selection();
+            SelectedUnit = Selection();
         }
         if(Input.GetMouseButtonDown(1) && SelectedUnit != null)
         {
-            Vector3 targetPosition = GetPoint();
-            if(targetPosition != new Vector3(-1, -1, -1))
+            UnitGroup possibleTarget = Selection();
+            if (possibleTarget != null)
             {
-                Debug.Log("Moving UnitGroup to positon " + targetPosition.ToString());
-                if (attackMove)
-                    SelectedUnit.AttackGroup(targetPosition);
-                SelectedUnit.MoveGroup(targetPosition);
+                SelectedUnit.AttackGroup(possibleTarget);
+            }
+            else
+            {
+                Vector3 targetPosition = GetPoint();
+                if (targetPosition != new Vector3(-1, -1, -1))
+                {
+                    SelectedUnit.MoveGroup(targetPosition);
+                }
             }
         }
         if(Input.GetKeyDown("e"))
         {
             UnitManager.instance.GetUnitGroup(GetPoint(), Quaternion.identity, 50, 10, 1.5f);
+        }
+        if(Input.GetKeyDown("1") && SelectedUnit != null)
+        {
+            SelectedUnit.ChangeTeam();
         }
     }
 
@@ -55,18 +57,21 @@ public class PlayerManager : MonoBehaviour
 
     //Sets SelectedUnit to the unit under the mous curser by using a raycast
     //from the player camera
-    private void Selection()
+    private UnitGroup Selection()
     {
         if (!Camera.main)
         {
-            return;
+            return null;
         }
 
         RaycastHit hit;
         if (Physics.Raycast(playerCamera.ScreenPointToRay(Input.mousePosition), out hit, hitRange, LayerMask.GetMask("Units")))
         {
-            SelectedUnit = hit.collider.GetComponent<Unit>().group;
-            Debug.Log("Selected Unit " + (hit.collider.GetComponent<Unit>().getID()).ToString());
+            return hit.collider.GetComponent<Unit>().group;
+        }
+        else
+        {
+            return null;
         }
     }
 
