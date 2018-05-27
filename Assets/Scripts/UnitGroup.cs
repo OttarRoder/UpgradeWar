@@ -17,6 +17,8 @@ public class UnitGroup : MonoBehaviour
     private bool activeEngage;
     private UnitGroup targetGroup;
 
+    //Temp
+    public Material enemy;
 
     private void Awake()
     {
@@ -157,6 +159,8 @@ public class UnitGroup : MonoBehaviour
         for(int i = 0; i < unitList.Count; i++)
         {
             unitList[i].Team++;
+            Renderer rend = unitList[i].GetComponent<Renderer>();
+            rend.material = enemy;
         }
     }
 }

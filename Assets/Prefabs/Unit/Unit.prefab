@@ -61,6 +61,7 @@ GameObject:
   - component: {fileID: 195294299058668930}
   - component: {fileID: 114985084753530684}
   - component: {fileID: 54943645311601886}
+  - component: {fileID: 208406163872858014}
   m_Layer: 9
   m_Name: Unit
   m_TagString: Unit
@@ -322,3 +323,18 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 3
+--- !u!208 &208406163872858014
+NavMeshObstacle:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1925903242047812}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.5, y: 1, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5

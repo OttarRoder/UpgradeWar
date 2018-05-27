@@ -84,11 +84,15 @@ public class Unit : MonoBehaviour
         if(Targets.Count > 0 && Combat == false)
         {
             Combat = true;
+            gameObject.GetComponent<NavMeshAgent>().enabled = false;
+            gameObject.GetComponent<NavMeshObstacle>().enabled = true;
             InvokeRepeating("Attack", 0, AttackSpeed);
         }
         if(Targets.Count == 0 && Combat == true)
         {
             Combat = false;
+            gameObject.GetComponent<NavMeshObstacle>().enabled = false;
+            gameObject.GetComponent<NavMeshAgent>().enabled = true;
             CancelInvoke();
         }
     }
@@ -109,6 +113,7 @@ public class Unit : MonoBehaviour
         unitCard.SetActive(true);
 
         HealthCurrent = HealthMax;
+        Team = 0;
         Combat = false;
     }
 
@@ -171,6 +176,9 @@ public class Unit : MonoBehaviour
 
     public void MoveUnit(Vector3 targetPosition)
     {
-        agent.SetDestination(targetPosition);
+        if (!Combat)
+        {
+            agent.SetDestination(targetPosition);
+        }
     }
 }
