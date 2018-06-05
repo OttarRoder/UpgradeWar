@@ -63,7 +63,7 @@ public class Unit : MonoBehaviour
         AttackMin = 6;
         AttackSpeed = 1.5f;
         AttackRange = 3;
-        HealthMax = 25;
+        HealthMax = 75;
         HealthCurrent = HealthMax;
     }
 
@@ -84,16 +84,13 @@ public class Unit : MonoBehaviour
         if(Targets.Count > 0 && Combat == false)
         {
             Combat = true;
-            gameObject.GetComponent<NavMeshAgent>().enabled = false;
-            gameObject.GetComponent<NavMeshObstacle>().enabled = true;
             InvokeRepeating("Attack", 0, AttackSpeed);
         }
         if(Targets.Count == 0 && Combat == true)
         {
-            Combat = false;
-            gameObject.GetComponent<NavMeshObstacle>().enabled = false;
-            gameObject.GetComponent<NavMeshAgent>().enabled = true;
             CancelInvoke();
+            Combat = false;
+
         }
     }
 
@@ -119,10 +116,10 @@ public class Unit : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Unit")
+        if (other.tag == "Unit")
         {
             Unit u = other.gameObject.GetComponent<Unit>();
-            if(u.Team != Team)
+            if (u.Team != Team)
             {
                 Targets.Add(u);
             }
@@ -178,7 +175,17 @@ public class Unit : MonoBehaviour
     {
         if (!Combat)
         {
-            agent.SetDestination(targetPosition);
+            RaycastHit hit;
+            bool b = Physics.Raycast(transform.position, Vector3.forward, out hit, 0.6f, LayerMask.GetMask("Units"));
+            if(b)
+            {
+                agent.isStopped = true;
+            }
+            else
+            {
+                agent.SetDestination(targetPosition);
+                agent.isStopped = false;
+            }
         }
     }
 }

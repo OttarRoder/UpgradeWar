@@ -37,7 +37,7 @@ public class UnitGroup : MonoBehaviour
     private void OnEnable()
     {
         SpawnGroup();
-        InvokeRepeating("FixPosition", 5, 0.5f);
+        InvokeRepeating("FixPosition", 5, 0.2f);
     }
 
     private void OnDisable()
